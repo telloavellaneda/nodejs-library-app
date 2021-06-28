@@ -1,0 +1,57 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml" 
+    xmlns:p="http://primefaces.org/ui" 
+    xmlns:f="http://java.sun.com/jsf/core" 
+    xmlns:h="http://java.sun.com/jsf/html" 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:pu="http://primefaces.org/ultima">
+
+    <link rel="StyleSheet" href="#{request.contextPath}/webapp/css/panel-menu-lateral.css" type="text/css" media="screen" />
+    <ui:fragment>
+        <h:form id="menuform"> 
+            <p:outputPanel id="menu-lateral">
+                <div class="layout-menu" style="top: 111px">
+                    <div class="nano">
+                        <div class="nano-content menu-scroll-content">
+                            <ui:fragment>
+                                <div class="profile">
+                                    <div class="profile-image"></div>
+                                    <span class="profile-name"></span><br />
+                                    <a id="profile-options" href="#">
+                                        <span class="profile-name">#{perfilUsuarioController.usuario.nombre} #{perfilUsuarioController.usuario.apaterno}</span>
+                                        <i class="material-icons">&#xE313;</i>
+                                    </a>
+                                </div>
+                                <ul id="profile-menu" class="ultima-menu">
+                                    <li role="menuitem">
+                                        <h:outputLink value="#{request.contextPath}/webapp/private/common/cambiar-contrasenia.jsf" class="ripplelink" style="font-size: 12px">
+                                            <i class="material-icons">&#xE897;</i>
+                                            <span>Cambiar Contraseña</span>
+                                        </h:outputLink>
+                                    </li>
+                                    <li role="menuitem" style="text-align: center">
+                                        <p:commandButton value="Cerrar Sesión" actionListener="#{perfilUsuarioController.cerrarSesion()}" styleClass="red-btn"  onclick="PF('me').clearMenuState()" />
+                                    </li>
+                                </ul>
+                            </ui:fragment>
+                            <p:scrollPanel mode="native" styleClass="menu-acordeon"> 
+                                <p:accordionPanel activeIndex="#{perfilUsuarioController.idxSSel}" styleClass="acordeon">  
+                                    <p:tab  title="#{perfilUsuarioController.incremetaIndexSup()} Menu" titleStyleClass="informes">  
+                                        <h:commandLink styleClass="#{perfilUsuarioController.revIndicador()}" value="Opcion 1" action="#">
+                                            <f:param name="idxS" value="#{perfilUsuarioController.indexSup}" />
+                                            <f:param name="idxI" value="#{perfilUsuarioController.indexInfAdd}" />
+                                        </h:commandLink>
+                                        <h:commandLink styleClass="#{perfilUsuarioController.revIndicador()}" value="Opcion 2" action="#">
+                                            <f:param name="idxS" value="#{perfilUsuarioController.indexSup}" />
+                                            <f:param name="idxI" value="#{perfilUsuarioController.indexInfAdd}" />
+                                        </h:commandLink>
+                                    </p:tab>
+                                </p:accordionPanel>
+                            </p:scrollPanel>
+                        </div>
+                    </div>
+                </div>
+            </p:outputPanel>
+        </h:form>
+    </ui:fragment>
+</ui:composition>

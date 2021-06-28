@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<project name="configenv">
+    <path id="classpath">
+        <pathelement path="${compile_classpath}"/>
+    </path>  
+    <property name="app.groupIdVersion" value="${groupIdVersion}"/>
+    
+    <!--replace . by / by package dir-->
+    <loadresource property="app.package.dir">
+        <string value="${app.groupIdVersion}"/>
+        <filterchain>
+            <replacestring from="." to="${file.separator}"/>
+            <striplinebreaks/>
+        </filterchain>
+    </loadresource>
+    
+    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="classpath"/>        
+           
+    <target name="production">        
+        <xmltask source="${basedir}/src/main/resources/mx/com/eai/tpp/spring/applicationContext-hibernate.xml" dest="${outputDir}/mx/com/eai/tpp/spring/applicationContext-hibernate.xml">
+            <remove path="/:beans/:bean[@id='dataSource']"/>      
+        </xmltask>             
+        <replace casesensitive="false" file="${outputDir}/mx/com/eai/tpp/spring/applicationContext-hibernate.xml">
+            <replacetoken><![CDATA[<!--<bean]]></replacetoken>  
+            <replacevalue><![CDATA[<bean]]></replacevalue>              
+        </replace>               
+        <replace casesensitive="false" file="${outputDir}/mx/com/eai/tpp/spring/applicationContext-hibernate.xml">
+            <replacetoken><![CDATA[</bean>-->]]></replacetoken>  
+            <replacevalue><![CDATA[</bean>]]></replacevalue>              
+        </replace>               
+        <replace casesensitive="false" file="${outputDir}/log4j.properties">
+            <replacetoken><![CDATA[log4j.logger.mx.com.eai.tpp=DEBUG]]></replacetoken>  
+            <replacevalue><![CDATA[log4j.logger.mx.com.eai.tpp=WARN]]></replacevalue>              
+        </replace>
+        <replace casesensitive="false" file="${outputDir}/database.properties">
+            <replacetoken><![CDATA[jdbc.user=sa]]></replacetoken>  
+            <replacevalue><![CDATA[#]]></replacevalue>   
+        </replace>  
+        <replace casesensitive="false" file="${outputDir}/database.properties">
+            <replacetoken><![CDATA[jdbc.password=T3M-G1T2]]></replacetoken>  
+            <replacevalue><![CDATA[#]]></replacevalue> 
+        </replace>
+        <replace casesensitive="false" file="${outputDir}/rutas.properties">
+            <replacetoken><![CDATA[archivos.temporal=]]></replacetoken>  
+            <replacevalue><![CDATA[#$archivos.temporal=]]></replacevalue>              
+        </replace>
+        <replace casesensitive="false" file="${outputDir}/rutas.properties">
+            <replacetoken><![CDATA[#&#$]]></replacetoken>  
+            <replacevalue><![CDATA[ ]]></replacevalue>              
+        </replace>
+    </target>
+</project>

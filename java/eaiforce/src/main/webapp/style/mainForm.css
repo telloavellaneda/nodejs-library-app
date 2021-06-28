@@ -1,0 +1,140 @@
+/* Form Layout */
+.form .left { width:55%; vertical-align:top; padding-right:5px }
+.form .right { width:45%; vertical-align:top; padding-left:5px }
+.form .left > table,
+.form .right > table { margin-bottom:15px }
+
+.form-div { height:631px; overflow:auto; overflow-x:hidden; overflow-y:auto }
+.form-div-status { display:table; width:100% }
+.form-div-documentos { height:500px; overflow:auto; overflow-x:hidden; overflow-y:auto }
+.form-div-seguimiento { height:auto; max-height:450px; overflow:auto; overflow-x:hidden; overflow-y:auto }
+.form-div-historial { height:auto; max-height:400px; overflow:auto; overflow-x:hidden; overflow-y:auto }
+
+.form-div-status > div { display:block; width:100%; padding-bottom:5px } 
+
+.form-sub-section { background-color:#29ABE2; color:#FFFFFF; text-align:left; font-weight:bold; height:30px; padding-left:10px; font-size:115% }
+
+.datos td { padding:3px 5px }
+.datos td:first-child { width:35%; text-align:right }
+.datos td:last-child { width:65%; text-align:left; color:#0082CA }
+
+.form-menu { height:45px; background-color:#29ABE2; border-color:#ffffff; border-style:solid; border-width:1px 0px 0px 0px; }
+.form-menu img { height:30px; width:30px }
+.form-menu table { height:100%; border-color:#ffffff; border-style:solid; cursor:pointer }
+.form-menu table:hover { background-color:#494949 }
+.form-menu .b { border-width:0px 1px 0px 1px; }
+
+.documentos tr:nth-child(odd) { background-color:#e2e2e2 }
+.documentos td:first-child { color:#0082CA }
+
+.seguimiento { padding:1px }
+.seguimiento table { background-color:#54b574; border-color:#ffffff; border-style:solid; cursor:pointer }
+.seguimiento table:hover { background-color:#494949 } 
+.seguimiento table td { padding:5px }
+.seguimiento table img { width:35px; height:35px }
+.seguimiento .a { width:50% }
+.seguimiento .b { width:50% }
+.seguimiento .a table { border-width:0px 1px 0px 0px; }
+
+.seguimiento-row td { height:30px; padding:2px 3px 2px 5px }
+.seguimiento-row td span:first-child { font-style:italic; font-size:95%; text-align:left; color:#2d426b; font-weight:bold; display:block; margin-bottom:5px; margin-top:3px }
+.seguimiento-row td span:last-child { color:#000000 }
+.seguimiento-row .a { cursor:pointer; background-color:#7ec18f; color:#2d416b; }
+.seguimiento-row .a img { width:25px; height:25px }
+.seguimiento-row .a:hover { background-color:#494949; color:#FFFFFF }
+.seguimiento-odd  { background-color:#abd8b8 }
+.seguimiento-even { background-color:#FFFFFF }
+
+/* Historial */
+.historial .desktop td { padding:3px; height:28px }
+.historial .desktop td:nth-child(1) { width:15% }
+.historial .desktop td:nth-child(2) { width:35% }
+.historial .desktop td:nth-child(3) { width:25% }
+.historial .desktop td:nth-child(4) { width:25% }
+.historial .odd { background-color:#FFFFFF }
+.historial .odd #bold { background-color:#e5e5e5 }
+.historial .odd td { color:#000000 }
+.historial .even { background-color:#F7C1D7 }
+.historial .even #bold { background-color:#F4B3D1 }
+.historial .even td { color:#000000 }
+.historial .desktop:hover, .historial .desktop:hover #bold,
+.historial .mobile:hover, .historial .mobile:hover #bold { background-color:#494949; }
+.historial .desktop:hover td, .historial .mobile:hover td { color:#FFFFFF }
+.historial .mobile { display:none }
+
+.historial-title tr { background-color:#EAEAEA; height:30px }
+.historial-title tr #bold { background-color:#E5E5E5; }
+.historial-title tr td { text-transform:uppercase; color:#0082CA; font-weight:bold }
+
+/* Boton */
+.refresh-title { border-radius:5px; height:40px; color:#FFFFFF;; background-color:#F46C96; padding:0px 8px; text-align:center; text-transform:uppercase; font-weight:bold; font-size:115% }
+.refresh-title:hover { background-color:#494949; color:#FFFFFF }
+.refresh-title img { width:30px; height:30px }
+
+@media only screen and (max-width: 768px)
+	,(min-device-width:768px) and (max-device-width:1024px) and (orientation : landscape)  {
+.form .left { display:block; width:100%; padding-right:0px }
+.form .right { display:block; width:100%; padding-left:0px }
+
+.form-menu { height:60px; }
+.form-menu img { height:45px; width:45px }
+
+.form-div { height:auto }
+.form-div-seguimiento { height:auto; }
+.form-div-documentos { height:auto; }
+.form-sub-section { height:45px }
+
+.seguimiento table td { padding:10px }
+.seguimiento table img { width:45px; height:45px }
+.seguimiento-row .a img { width:45px; height:45px }
+
+.documentacion td:first-child { width:45%; text-align:center }
+.documentacion td:last-child { width:55%; text-align:left; padding-left:10px }
+.documentacion td:last-child img { width:25px; height:25px }
+.documentacion td:last-child span { padding-left:5px }
+
+.historial .desktop { display:none }
+.historial .mobile { display:table-row }
+.historial .mobile table td { padding:2px 10px; text-align:left }
+.historial .mobile table td:first-child { width:30%; font-style:italic; font-size:90%; }
+.historial .mobile table td:last-child  { width:70%; font-style:normal; font-size:95%; }
+.historial .mobile table tr:first-child td:last-child { font-weight:bold }
+.historial .mobile table tr:last-child  td:last-child { font-style:italic }
+.historial-container { height:auto; }
+
+.refresh-title { height:60px }
+.refresh-title img { width:45px; height:45px }
+}
+
+@media only screen and (max-width: 667px) {
+.form-menu { height:50px; }
+.form-menu img { height:35px; width:35px }
+
+.form-button table { height:50px; }
+.form-button img { height:35px; width:35px }
+.seguimiento-row .a img { width:35px; height:35px }
+}
+
+@media only screen and (max-width: 480px) {
+.seguimiento table td { padding:5px }
+.seguimiento table img { width:40px; height:40px }
+
+.documentacion td:first-child { display:block; width:100%; text-align:left }
+.documentacion td:last-child { display:block; width:100%; padding:5px 5px 10px 0px  }
+.documentacion td:last-child img { width:25px; height:25px }
+.documentacion td:last-child span { padding-left:0px }
+
+.search-mobile-count { width:8%; padding:0px 4px; }
+.search-mobile-a { width:35%; padding:0px 1px; }
+.search-mobile-b { width:57% }
+.search-message { padding:10px; background-color:#C9C6C6; }
+.search-message span { display:block; padding:2px 25px; color:#000000 }
+
+.refresh-title { height:50px }
+.refresh-title img { width:35px; height:35px }
+}
+
+@media only screen and (max-width: 320px) {
+.seguimiento-row td span:last-child { }
+
+}

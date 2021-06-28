@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <script>
+        $ = jQuery;
+        $(document).ready(function () {
+            $(".active-menuitem").children('ul').hide();
+            $(".active-menuitem").removeClass("active-menuitem");
+        });
+    </script>
+    <h:body>
+        <h:form>
+            <div style="width: calc(100%-20px); height: 40px; background: #0082CA; padding: 10px; color: #ffffff">
+                <div class="div-titulo-header" style="width: calc(100% - 120px); float: left; font-size: 20px; font-weight: bold; text-align: left">Gestor Integral de Accesos<br /><span style="font-size: 16px">Terminales Portuarias del Pacífico</span></div>
+                <div style="float: right; width: 50px; text-align: center; margin-top: 7px;"><p:commandLink actionListener="#{perfilUsuarioController.cerrarSesion()}" style="color: #ffffff"><i class="fa fa-sign-out" style="font-size: 28px"></i></p:commandLink></div>
+                <div style="float: right; width: 50px; text-align: center; margin-top: 7px;"><h:commandLink action="/webapp/private/solicitud/detalle-solicitud.jsf" style="color: #ffffff"><i class="fa fa-home" style="font-size: 28px"></i></h:commandLink></div>
+            </div>
+            <div align="left" style="padding:5px 15px; background: #eeeeee; height: 24px;">
+                <div style="float: left; line-height: 24px;">
+                    <h:outputText value="#{perfilUsuarioController.usuario.nombre} #{perfilUsuarioController.usuario.apaterno} #{perfilUsuarioController.usuario.amaterno} " styleClass="negritas" />
+                    <p:spacer width="10px" />
+                    <h:commandLink action="/webapp/private/common/cambiar-contrasenia.jsf" style="color: #000000"><i class="fa fa-unlock-alt"></i></h:commandLink>
+                </div>
+                <div style="float: right">
+                    <p:commandButton value="Mis solicitudes" oncomplete="PF('sidebar2').show()" styleClass="teal-btn btn-chico" rendered="#{perfilUsuarioController.usuario.tipousuarioid.tipousuarioid == 2}"/>
+                    <p:commandButton value="Usuarios" actionListener="#{perfilUsuarioController.redirect(1)}" styleClass="teal-btn btn-chico" rendered="#{perfilUsuarioController.usuario.tipousuarioid.tipousuarioid == 1}"/>
+                    <p:menuButton value="Menu" iconPos="right" styleClass="teal-btn btn-chico" rendered="#{perfilUsuarioController.usuario.tipousuarioid.tipousuarioid == 3}">
+                        <p:menuitem icon="ui-icon-document" value="Mis solicitudes" oncomplete="PF('sidebar2').show()" styleClass="teal-btn btn-chico" />
+                        <p:menuitem icon="ui-icon-check" value="Revisiones" actionListener="#{perfilUsuarioController.redirect(2)}"/>
+                        <p:menuitem icon="ui-icon-person" value="Usuarios" actionListener="#{perfilUsuarioController.redirect(1)}"/>
+                    </p:menuButton>
+                </div>
+            </div>
+
+            <p:dialog header="Mis Solicitudes Registradas" widgetVar="sidebar2" position="right bottom" closable="true" modal="true" draggable="false" showEffect="slide" hideEffect="slide" height="calc(100vh - 200px)" style="max-width: 700px" styleClass="dialog-solicitudes">
+                <p:dataTable rowStyleClass="#{sol.estatussolicitudid.estatussolicitudid == 2 and sol.aprobacionfinal == 0 ? 'td_verde' : (sol.estatussolicitudid.estatussolicitudid == 3 ? 'td_aviso' : '')}" id="table-materiales" selectionMode="single" value="#{perfilUsuarioController.solicitudes}" rowKey="#{sol.solicitudid}" var="sol" paginator="true" paginatorPosition="bottom" rows="20" emptyMessage="No hay ninguna solicitud solicitud">
+                    <p:ajax event="rowSelect" listener="#{perfilUsuarioController.redirectSolicitud}" />
+                    <p:column width="100" headerText="Folio" styleClass="right" sortBy="#{sol.solicitudid}" >
+                        <h:outputText value="#{sol.solicitudid}" />
+                    </p:column>
+                    <p:column headerText="Registro" styleClass="centrado" sortBy="#{sol.fecharegistro}" priority="5">
+                        <h:outputText value="#{sol.fecharegistro}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo" styleClass="centrado" sortBy="#{sol.tiposolicitudid.descripcion}">
+                        <h:outputText value="#{sol.tiposolicitudid.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Ingreso" styleClass="centrado" sortBy="#{sol.fechainicio}" priority="4">
+                        <h:outputText value="#{sol.fechainicio}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estatus" styleClass="centrado" sortBy="#{sol.estatussolicitudid.descripcion}">
+                        <h:outputText value="#{sol.estatussolicitudid.estatussolicitudid == 2 and sol.aprobacionfinal == 1 ? 'En revisión' :  sol.estatussolicitudid.descripcion}" />
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
+

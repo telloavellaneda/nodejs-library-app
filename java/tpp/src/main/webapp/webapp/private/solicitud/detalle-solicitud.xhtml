@@ -1,0 +1,931 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="content">
+
+        <h:form id="solicitud-form">
+            <p:outputPanel rendered="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin and detalleSolicitudController.detalleSolicitudForm.numSolicitud == 0}">
+
+                <p:panel header="Busqueda de Solicitudes">
+                    <div align="center">
+                        <p:commandButton styleClass="amber-btn" value="Registrar nueva solicitud" update=":solicitud-form" rendered="#{detalleSolicitudController.detalleSolicitudForm.usuario.tipousuarioid.tipousuarioid == 3}">
+                            <f:setPropertyActionListener target="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}" value="false" />
+                        </p:commandButton>
+                        <p:spacer height="10px" />
+                    </div>
+                    
+                    <div class="ui-g" style="display: #{detalleSolicitudController.detalleSolicitudForm.usuario.tipousuarioid.tipousuarioid == 1 ? '' : 'none'}">
+                        <div class="ui-g-3 ui-md-2 ui-lg-1">
+                            <h:outputText value="Folio:" />
+                        </div>
+                        <div class="ui-g-9 ui-md-10 ui-lg-11">
+                            <p:inputText  value="#{detalleSolicitudController.detalleSolicitudForm.folioSolicitud}"/>
+                        </div>
+                        <div class="ui-g-3 ui-md-2 ui-lg-1">
+                            <h:outputText value="Fecha de inicio:" />
+                        </div>
+                        <div class="ui-g-9 ui-md-3 ui-lg-3">
+                            <p:calendar navigator="true" size="13" value="#{detalleSolicitudController.detalleSolicitudForm.busquedaFechaInicio}" showOn="button" pattern="dd/MM/yyyy" yearRange="-5:+0" />
+                        </div>
+                        <div class="ui-g-3 ui-md-2 ui-lg-1">
+                            <h:outputText value="Fecha de fin:" />
+                        </div>
+                        <div class="ui-g-9 ui-md-5 ui-lg-3">
+                            <p:calendar navigator="true" size="13" value="#{detalleSolicitudController.detalleSolicitudForm.busquedaFechaFin}" showOn="button" pattern="dd/MM/yyyy" yearRange="-5:+0"/>
+                        </div>
+                        <div class="ui-g-3 ui-md-2 ui-lg-1">
+                            <h:outputText value="Estatus:" />
+                        </div>
+                        <div class="ui-g-7 ui-md-3 ui-lg-2">
+                            <p:selectOneMenu value="#{detalleSolicitudController.detalleSolicitudForm.estatusSeleccionado}">
+                                <f:selectItem itemLabel="Todas" itemValue="0" />
+                                <f:selectItem itemLabel="Pendientes" itemValue="1" />
+                                <f:selectItem itemLabel="Aprobadas" itemValue="2" />
+                                <f:selectItem itemLabel="Rechazadas" itemValue="3" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-7 ui-lg-1">
+                            <p:commandButton icon="ui-icon-search" actionListener="#{detalleSolicitudController.buscarSolicitudes}" update="table-solicitudes" />
+                        </div>
+                    </div>
+                </p:panel>
+                <p:dataTable id="table-solicitudes" rowStyleClass="#{sol.estatussolicitudid.estatussolicitudid == 2 and sol.aprobacionfinal == 0 ? 'td_verde' : (sol.estatussolicitudid.estatussolicitudid == 3 ? 'td_aviso' : '')}"
+                             selectionMode="single" value="#{detalleSolicitudController.detalleSolicitudForm.solicitudes}" rowKey="#{sol.solicitudid}" var="sol" 
+                             paginator="true" paginatorPosition="bottom" rows="20" emptyMessage="No hay ninguna solicitud solicitud">
+                    <p:ajax event="rowSelect" listener="#{detalleSolicitudController.redirectSolicitud}" update=":solicitud-form" />
+                    <f:facet name="header">
+                        <h:outputText value="Lista de Solicitudes" />
+                    </f:facet>
+                    <p:column width="100" headerText="Folio" styleClass="right" sortBy="#{sol.solicitudid}" >
+                        <h:outputText value="#{sol.solicitudid}" />
+                    </p:column>
+                    <p:column headerText="Registro" styleClass="centrado" sortBy="#{sol.fecharegistro}" priority="6">
+                        <h:outputText value="#{sol.fecharegistro}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Usuario" sortBy="#{sol.persid.nombre} #{sol.persid.apaterno}">
+                        <h:outputText value="#{sol.persid.nombre} #{sol.persid.apaterno}" />
+                    </p:column>
+                    <p:column headerText="Revisado" sortBy="#{sol.ultimousuariorevisaid.nombre} #{sol.ultimousuariorevisaid.apaterno}" priority="5">
+                        <h:outputText value="#{sol.ultimousuariorevisaid.nombre} #{sol.ultimousuariorevisaid.apaterno} / "/><h:outputText value="#{sol.ultimousuariorevisaid.empresa}"/>
+                    </p:column>
+                    <p:column headerText="Tipo" styleClass="centrado" sortBy="#{sol.tiposolicitudid.descripcion}">
+                        <h:outputText value="#{sol.tiposolicitudid.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Ingreso" styleClass="centrado" sortBy="#{sol.fechainicio}" priority="4">
+                        <h:outputText value="#{sol.fechainicio}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estatus" styleClass="centrado" sortBy="#{sol.estatussolicitudid.descripcion}" priority="5">
+                        <h:outputText value="#{sol.estatussolicitudid.estatussolicitudid == 2 and sol.aprobacionfinal == 1 ? 'En revisión' :  sol.estatussolicitudid.descripcion}" />
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+            <p:outputPanel rendered="#{detalleSolicitudController.detalleSolicitudForm.numSolicitud != 0 or !detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                <div align="center" >
+                    <h:outputText value="#{detalleSolicitudController.detalleSolicitudForm.numSolicitud == 0 ? 'Registrar nueva solicitud' : 'Datos de la solicitud'}" style="font-size: 20px; font-weight: bold; color: #0082CA" />
+                    <br />
+                    <p:spacer height="10px" />
+                </div>
+                <p:outputPanel id="tipo-solicitud" rendered="#{detalleSolicitudController.detalleSolicitudForm.numSolicitud == 0 
+                                                               and !detalleSolicitudController.detalleSolicitudForm.renderDetallePersonal
+                                                               and detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid != 3}">
+                    <div class="ui-g" style="max-width: 900px" >
+                        <div class="ui-g-12 ui-md-5">
+                            <h:outputText value="Selecciona el tipo de solicitud que desea realizar" />
+                        </div>
+                        <div class="ui-g-12 ui-md-7">
+                            <p:selectOneRadio disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}" 
+                                              value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid}">
+                                <p:ajax update=":solicitud-form" />
+                                <f:selectItem itemLabel="Personal" itemValue="1" />
+                                <f:selectItem itemLabel="Vehículo" itemValue="2" />
+                                <f:selectItem itemLabel="Material" itemValue="3" />
+                            </p:selectOneRadio>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-5" style="display: #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 1 ? '' : 'none'}">
+                            <h:outputText value="¿La persona es mexicana o extranjera?" />
+                        </div>
+                        <div class="ui-g-12 ui-md-7" style="display: #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 1 ? '' : 'none'}">
+                            <p:selectOneRadio value="#{detalleSolicitudController.detalleSolicitudForm.personal.extranjero}">
+                                <p:ajax update="tipo-solicitud" />
+                                <f:selectItem itemLabel="Mexicana" itemValue="1" />
+                                <f:selectItem itemLabel="Extranjera" itemValue="2" />
+                            </p:selectOneRadio>
+                        </div>
+                        <p:outputPanel rendered="#{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 1}">
+                            <div class="ui-g-12">
+                                <p:panelGrid>
+                                    <p:row>
+                                        <p:column >
+                                            <h:outputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.extranjero == 1 ? 'CURP' : 'Pasaporte'}" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.curp}" size="20" maxlength="18">
+                                                <p:keyFilter regEx="/[a-z0-9]/i"/>
+                                            </p:inputText>
+                                        </p:column>
+                                        <p:column>
+                                            <p:commandButton icon="ui-icon-search" actionListener="#{detalleSolicitudController.buscaPersonal()}" process="tipo-solicitud" update=":solicitud-form" />
+                                        </p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                            </div>
+                        </p:outputPanel>
+                        <p:outputPanel rendered="#{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 2}">
+                            <div class="ui-g-12">
+                                <p:panelGrid>
+                                    <p:row>
+                                        <p:column>
+                                            <h:outputText value="Ingresa el número de placa" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.placa}" size="8">
+                                                <p:keyFilter regEx="/[a-z0-9]/i"/>
+                                            </p:inputText>
+                                        </p:column>
+                                        <p:column>
+                                            <p:commandButton icon="ui-icon-search" actionListener="#{detalleSolicitudController.buscaVehiculo()}" process="tipo-solicitud" update=":solicitud-form" />
+                                        </p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                            </div>
+                        </p:outputPanel>
+                    </div>
+                </p:outputPanel>
+                <p:outputPanel rendered="#{detalleSolicitudController.detalleSolicitudForm.numSolicitud != 0}">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-lg-6">
+                            <div class="ui-g" >
+                                <div class="ui-g-12">
+                                    <h:outputText value="Solicitud de Acceso de #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.descripcion}" />
+                                    <p:spacer width="10px" height="1px"/>
+                                    <h:outputText value="Folio: #{detalleSolicitudController.detalleSolicitudForm.solicitud.solicitudid}" styleClass="negritas" />
+                                </div>
+                                <div class="ui-g-12">
+                                    <h:outputText value="Estatus: " />
+                                    <h:outputText value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.estatussolicitudid.estatussolicitudid == 2 and detalleSolicitudController.detalleSolicitudForm.solicitud.aprobacionfinal == 1 
+                                                           ? 'En revisión' :  detalleSolicitudController.detalleSolicitudForm.solicitud.estatussolicitudid.descripcion}" styleClass="negritas" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-lg-6">
+                            <div class="ui-g" >
+                                <div class="ui-g-12">
+                                    <h:panelGroup styleClass="md-inputfield" rendered="#{detalleSolicitudController.detalleSolicitudForm.solicitud.estatussolicitudid.estatussolicitudid != 1}">
+                                        <p:inputTextarea value="#{detalleSolicitudController.detalleSolicitudForm.ultimaRevisionSolicitud.observaciones}" rows="4" cols="40" readonly="true"/>
+                                        <label>Observaciones</label>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12">
+                            <p:panelGrid rendered="#{detalleSolicitudController.detalleSolicitudForm.renderDocAprobacion or (detalleSolicitudController.detalleSolicitudForm.usuarioAdmin and detalleSolicitudController.detalleSolicitudForm.solicitud.aprobacionfinal == 0)}">
+                                <p:row>
+                                    <p:column  styleClass="vertical-align-top">
+                                        <p:commandButton onsuccess="cerrarDescarga();" value="Documento de aprobación" icon="fa fa-user" styleClass="green-btn"
+                                                         disabled="#{detalleSolicitudController.detalleSolicitudForm.solicitud.driveaprobacion == null}"
+                                                         actionListener="#{detalleSolicitudController.descargarArchivo(7)}" update=":download-form" process="@this"/>
+                                    </p:column>
+                                    <p:column style="padding: 0" rendered="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin and detalleSolicitudController.detalleSolicitudForm.usuario.tipousuarioid.tipousuarioid == 1}">
+                                        <p:panelGrid>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:fileUpload auto="true" mode="advanced" label="Actualizar" 
+                                                                  fileUploadListener="#{detalleSolicitudController.uploadAprobacion}"
+                                                                  sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                                  allowTypes="/(\.|\/)(zip|rar|pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser zip, rar, pdf, png o jpg"
+                                                                  update="aprobacion-ok aprobacion2-ok"/> 
+                                                </p:column>
+                                                <p:column styleClass="vertical-align-top">
+                                                    <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="aprobacion-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfAprobacion == null}"/>
+                                                </p:column>
+                                            </p:row>    
+                                        </p:panelGrid>
+                                    </p:column>
+                                </p:row>
+                                <p:row rendered="#{detalleSolicitudController.detalleSolicitudForm.usuario.tipousuarioid.tipousuarioid == 1}">
+                                    <p:column styleClass="vertical-align-top">
+                                        <p:commandButton value="Guardar" styleClass="green-btn" id="aprobacion2-ok" actionListener="#{detalleSolicitudController.subirAprobacion}" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfAprobacion == null}"/>
+                                    </p:column>
+                                    <p:column styleClass="vertical-align-top">
+                                        <p:commandButton value="Revocar Acceso" styleClass="red-btn" onclick="PF('confirmRevocar').show()" rendered="#{detalleSolicitudController.detalleSolicitudForm.solicitud.aprobacionfinal == 0}"/>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                        </div>
+                    </div>
+                </p:outputPanel>
+                <p:outputPanel id="detalle-personal" rendered="#{detalleSolicitudController.detalleSolicitudForm.renderDetallePersonal}">
+                    <p:panel header="Datos Personales">
+                        <p:outputPanel id="datos-personales">
+                            <div class="ui-g" style="max-width: 950px">
+                                <div class="ui-g-4 ui-md-2 ui-lg-1">
+                                    <h:outputText value="Nombre" />
+                                </div>
+                                <div class="ui-g-8 ui-md-4 ui-lg-3">
+                                    <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.nombre}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+                                <div class="ui-g-4 ui-md-2 ui-lg-1">
+                                    <h:outputText value="Paterno" />
+                                </div>
+                                <div class="ui-g-8 ui-md-4 ui-lg-3">
+                                    <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.apaterno}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+                                <div class="ui-g-4 ui-md-2 ui-lg-1">
+                                    <h:outputText value="Materno" />
+                                </div>
+                                <div class="ui-g-8 ui-md-10 ui-lg-3">
+                                    <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.amaterno}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+
+                                <div class="ui-g-4 ui-md-2 ui-lg-1">
+                                    <h:outputText value="Nacionalidad" />
+                                </div>
+                                <div class="ui-g-8 ui-md-4 ui-lg-3">
+                                    <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.extranjero == 1 ? 'Mexicana' : 'Extranjero'}" size="10"  readonly="true" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+                                <div class="ui-g-4 ui-md-2 ui-lg-1">
+                                    <h:outputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.extranjero == 1 ? 'CURP' : 'Pasaporte'}" />
+                                </div>
+                                <div class="ui-g-8 ui-md-4 ui-lg-3">
+                                    <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.curp}" readonly="true" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+                                <div class="ui-g-4 ui-md-2 ui-lg-2">
+                                    <h:outputText value="Tipo Sanguíneo" />
+                                </div>
+                                <div class="ui-g-8 ui-md-4 ui-lg-2">
+                                    <p:selectOneMenu value="#{detalleSolicitudController.detalleSolicitudForm.personal.tiposanguineo}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                                        <f:selectItem itemLabel="O−" itemValue="O-" />
+                                        <f:selectItem itemLabel="O+" itemValue="O+" />
+                                        <f:selectItem itemLabel="A−" itemValue="A−" />
+                                        <f:selectItem itemLabel="A+" itemValue="A+" />
+                                        <f:selectItem itemLabel="B−" itemValue="B−" />
+                                        <f:selectItem itemLabel="B+" itemValue="B+" />
+                                        <f:selectItem itemLabel="AB−" itemValue="AB−" />
+                                        <f:selectItem itemLabel="AB+" itemValue="AB+" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </p:outputPanel>
+                        <p:panelGrid>
+                            <p:row>
+                                <p:column rendered="#{detalleSolicitudController.detalleSolicitudForm.renderFoto}" styleClass="vertical-align-top">
+                                    <p:commandButton onsuccess="cerrarDescarga();" value="Fotografía" icon="fa fa-user" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarArchivo(1)}" update=":download-form" process="@this"/>
+                                </p:column>
+                                <p:column colspan="#{detalleSolicitudController.detalleSolicitudForm.renderFoto ? 1 : 2}" style="padding: 0">
+                                    <p:panelGrid>
+                                        <p:row>
+                                            <p:column>
+                                                <p:fileUpload auto="true" mode="advanced" label="#{detalleSolicitudController.detalleSolicitudForm.renderFoto ? 'Actualizar' : 'Adjuntar Fotografía'}" 
+                                                              fileUploadListener="#{detalleSolicitudController.uploadFotografia}"
+                                                              sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                              allowTypes="/(\.|\/)(png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser png o jpg" 
+                                                              update="fotografia-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}" />
+                                            </p:column>
+                                            <p:column styleClass="vertical-align-top">
+                                                <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="fotografia-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.imagenFotografia == null}"/>
+                                            </p:column>
+                                        </p:row>    
+                                    </p:panelGrid>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column rendered="#{detalleSolicitudController.detalleSolicitudForm.renderIdentificacion}" styleClass="vertical-align-top">
+                                    <p:commandButton onsuccess="cerrarDescarga();" value="Identificación" icon="fa fa-book" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarArchivo(2)}" update=":download-form" process="@this"/>
+                                </p:column>
+                                <p:column colspan="#{detalleSolicitudController.detalleSolicitudForm.renderIdentificacion ? 1 : 2}" style="padding: 0">
+                                    <p:panelGrid>
+                                        <p:row>
+                                            <p:column>
+                                                <p:fileUpload auto="true" mode="advanced" label="#{detalleSolicitudController.detalleSolicitudForm.renderIdentificacion ? 'Actualizar' : 'Adjuntar Identificación'}" 
+                                                              fileUploadListener="#{detalleSolicitudController.uploadIdentificacion}"
+                                                              sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                              allowTypes="/(\.|\/)(pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser pdf, png o jpg" 
+                                                              update="identificacion-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                            </p:column>
+                                            <p:column styleClass="vertical-align-top">
+                                                <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="identificacion-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfIdentificacion == null}"/>
+                                            </p:column>
+                                        </p:row>    
+                                    </p:panelGrid>
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:panel header="Datos del Seguro Médico">
+                        <p:outputPanel id="datos-seguro">
+                            <div class="ui-g" >
+                                <div class="ui-g-3 ui-lg-2">
+                                    <h:outputText value="Tipo de Seguro" />
+                                </div>
+                                <div class="ui-g-9 ui-lg-4">
+                                    <p:selectOneMenu value="#{detalleSolicitudController.detalleSolicitudForm.personal.tiposeguro}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                                        <p:ajax update="datos-seguro" process="@this" />
+                                        <f:selectItem itemLabel="Seguro Social" itemValue="Seguro Social" />
+                                        <f:selectItem itemLabel="ISSSTE" itemValue="ISSSTE" />
+                                        <f:selectItem itemLabel="Seguro de Gastos Médicos" itemValue="Seguro de Gastos Médicos" />
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="ui-g-3 ui-lg-2">
+                                    <h:outputText value="Número o Póliza" />
+                                </div>
+                                <div class="ui-g-9 ui-lg-4">
+                                    <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.numseguro}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+
+                                <div class="ui-g-3 ui-lg-2" style="line-height: 40px; display: #{detalleSolicitudController.detalleSolicitudForm.personal.tiposeguro.equals('Seguro de Gastos Médicos') ? '' : 'none'}">
+                                    <h:outputText value="Vigencia" />
+                                </div>
+                                <div class="ui-g-9 ui-lg-10" style="display: #{detalleSolicitudController.detalleSolicitudForm.personal.tiposeguro.equals('Seguro de Gastos Médicos') ? '' : 'none'}">
+                                    <p:calendar navigator="true" size="14" value="#{detalleSolicitudController.detalleSolicitudForm.personal.vigenciaseguro}" mindate="#{detalleSolicitudController.detalleSolicitudForm.fechaInicio}" showOn="button" pattern="dd/MM/yyyy" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"  yearRange="-0:+5"/>
+                                </div>
+                            </div>
+
+                            <p:panelGrid>
+                                <p:row rendered="#{detalleSolicitudController.detalleSolicitudForm.personal.tiposeguro.equals('Seguro de Gastos Médicos')}">
+                                    <p:column rendered="#{detalleSolicitudController.detalleSolicitudForm.renderSeguro}" styleClass="vertical-align-top">
+                                        <p:commandButton onsuccess="cerrarDescarga();" value="Póliza" icon="fa fa-heart" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarArchivo(3)}" update=":download-form" process="@this"/>
+                                    </p:column>
+                                    <p:column colspan="#{detalleSolicitudController.detalleSolicitudForm.renderSeguro ? 1 : 2}" style="padding: 0">
+                                        <p:panelGrid>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:fileUpload auto="true" mode="advanced" label="#{detalleSolicitudController.detalleSolicitudForm.renderSeguro ? 'Actualizar' : 'Adjuntar Póliza'}" 
+                                                                  fileUploadListener="#{detalleSolicitudController.uploadPolizaSeguroMedico}"
+                                                                  sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                                  allowTypes="/(\.|\/)(pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser pdf, png o jpg" 
+                                                                  update="poliza-medico-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                                </p:column>
+                                                <p:column styleClass="vertical-align-top">
+                                                    <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="poliza-medico-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfPolizaSeguroMedico == null}"/>
+                                                </p:column>
+                                            </p:row>    
+                                        </p:panelGrid>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                        </p:outputPanel>
+                    </p:panel>
+                    <p:panel header="Datos de la Solicitud">
+                        <p:outputPanel id="datos-solicitud">
+                            <div class="ui-g" >
+                                <div class="ui-g-3 ui-md-2">
+                                    <h:outputText value="Empresa" />
+                                </div>
+                                <div class="ui-g-9 ui-md-10">
+                                    <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.personal.empresa}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+
+                                <div class="ui-g-3  ui-md-2" style="line-height: 40px;">
+                                    <h:outputText value="Fecha inicio" />
+                                </div>
+                                <div class="ui-g-9  ui-md-4">
+                                    <p:calendar size="14" value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.fechainicio}" mindate="#{detalleSolicitudController.detalleSolicitudForm.fechaInicio}" maxdate="#{detalleSolicitudController.detalleSolicitudForm.fechaFin}" showOn="button" pattern="dd/MM/yyyy" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+                                <div class="ui-g-3  ui-md-2" style="line-height: 40px;">
+                                    <h:outputText value="Fecha fin" />
+                                </div>
+                                <div class="ui-g-9  ui-md-4">
+                                    <p:calendar size="14" value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.fechafin}" mindate="#{detalleSolicitudController.detalleSolicitudForm.fechaInicio}" maxdate="#{detalleSolicitudController.detalleSolicitudForm.fechaFin}" showOn="button" pattern="dd/MM/yyyy" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                </div>
+
+                                <div class="ui-g-12">
+                                    <br/>
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputTextarea value="#{detalleSolicitudController.detalleSolicitudForm.detallepersonal.actividad}" rows="5" cols="50" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                        <label>Actividad específica a realizar</label>
+                                    </h:panelGroup>
+                                </div>
+
+                                <div class="ui-g-4">
+                                    <h:outputText value="¿Requiere acceso de chofer?" />
+                                </div>
+                                <div class="ui-g-8">
+                                    <p:selectOneRadio value="#{detalleSolicitudController.detalleSolicitudForm.detallepersonal.requierechofer}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                                        <p:ajax update="datos-solicitud" process="datos-solicitud" />
+                                        <f:selectItem itemLabel="Sí" itemValue="1" />
+                                        <f:selectItem itemLabel="No" itemValue="2" />
+                                    </p:selectOneRadio>
+                                </div>
+                                <p:outputPanel rendered="#{detalleSolicitudController.detalleSolicitudForm.detallepersonal.requierechofer == 1}">
+                                    <div class="ui-g-4">
+                                        <h:outputText value="Vigencia de la licencia" />
+                                    </div>
+                                    <div class="ui-g-8">
+                                        <p:calendar navigator="true" value="#{detalleSolicitudController.detalleSolicitudForm.personal.vigencialicenciamanejo}" mindate="#{detalleSolicitudController.detalleSolicitudForm.fechaInicio}" showOn="button" pattern="dd/MM/yyyy" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"  yearRange="-0:+5"/>
+                                    </div>
+                                    <div class="ui-g-12">
+                                        <p:panelGrid>
+                                            <p:row rendered="#{detalleSolicitudController.detalleSolicitudForm.detallepersonal.requierechofer == 1}">
+                                                <p:column rendered="#{detalleSolicitudController.detalleSolicitudForm.renderLicencia}" styleClass="vertical-align-top">
+                                                    <p:commandButton onsuccess="cerrarDescarga();" value="Licencia" icon="fa fa-truck" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarArchivo(4)}" update=":download-form" process="@this"/>
+                                                </p:column>
+                                                <p:column colspan="#{detalleSolicitudController.detalleSolicitudForm.renderLicencia ? 1 : 2}" style="padding: 0">
+                                                    <p:panelGrid>
+                                                        <p:row>
+                                                            <p:column>
+                                                                <p:fileUpload auto="true" mode="advanced" label="#{detalleSolicitudController.detalleSolicitudForm.renderLicencia ? 'Actualizar' : 'Adjuntar Licencia'}" 
+                                                                              fileUploadListener="#{detalleSolicitudController.uploadLicencia}"
+                                                                              sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                                              allowTypes="/(\.|\/)(pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser pdf, png o jpg" 
+                                                                              update="licencia-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                                            </p:column>
+                                                            <p:column styleClass="vertical-align-top">
+                                                                <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="licencia-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfLicencia == null}"/>
+                                                            </p:column>
+                                                        </p:row>    
+                                                    </p:panelGrid>
+                                                </p:column>
+                                            </p:row>
+                                        </p:panelGrid>
+                                    </div>
+                                </p:outputPanel>
+                            </div>
+                        </p:outputPanel>
+                    </p:panel>
+                </p:outputPanel>
+
+                <p:outputPanel id="detalle-material" rendered="#{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 3}">
+                    <p:panel header="Datos de los materiales">
+                        <p:panelGrid id="detalle-material-motivo">
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Motivo de ingreso" />
+                                </p:column>
+                                <p:column>
+                                    <p:selectOneMenu value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.motivoingresoid.motivoingresoid}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                                        <f:selectItems value="#{detalleSolicitudController.detalleSolicitudForm.motivos}" var="motivo" itemLabel="#{motivo.descripcion}" itemValue="#{motivo.motivoingresoid}" />
+                                    </p:selectOneMenu>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column styleClass="vertical-align-top">
+                                    <h:outputText value="Tipo de ingreso" />
+                                </p:column>
+                                <p:column>
+                                    <p:selectOneMenu value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.tipoentrada}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                                        <f:selectItem itemLabel="Entrada" itemValue="1" />
+                                        <f:selectItem itemLabel="Salida" itemValue="2" />
+                                        <f:selectItem itemLabel="Entrada y Salida" itemValue="3" />
+                                    </p:selectOneMenu>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column colspan="2">
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputTextarea value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.uso}" rows="5" cols="40"/>
+                                        <label>Detalla el uso que se le dará a los materiales</label>
+                                    </h:panelGroup>
+                                </p:column>
+                            </p:row>
+                            <p:row rendered="#{!detalleSolicitudController.detalleSolicitudForm.renderDetalleMaterial}">
+                                <p:column colspan="2">
+                                    <p:commandButton value="Agregar otro material" update=":solicitud-form:detalle-material" process="@this" styleClass="green-btn" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                                        <f:setPropertyActionListener value="true" target="#{detalleSolicitudController.detalleSolicitudForm.renderDetalleMaterial}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+                        <br/>
+                        <p:spacer height="15px" />
+                        <br />
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-lg-6" style="display: #{detalleSolicitudController.detalleSolicitudForm.renderDetalleMaterial ? '' : 'none'}">
+                                <p:panelGrid id="datos-material" rendered="#{detalleSolicitudController.detalleSolicitudForm.renderDetalleMaterial}">
+
+                                    <p:row>
+                                        <p:column>
+                                            <h:outputText value="Cantidad" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.material.cantidad}" size="3"/>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>
+                                            <h:outputText value="Descripción" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.material.descripcion}" />
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>
+                                            <h:outputText value="Marca" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.material.marca}"/>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>
+                                            <h:outputText value="Modelo" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.material.modelo}" />
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>
+                                            <h:outputText value="Número de serie" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.material.numserie}"/>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>
+                                            <h:outputText value="Propietario" />
+                                        </p:column>
+                                        <p:column>
+                                            <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.material.propietario}"/>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column colspan="2"  style="padding: 0">
+                                            <p:panelGrid  style="padding: 0">
+                                                <p:row>
+                                                    <p:column>
+                                                        <p:fileUpload auto="true" mode="advanced" label="Adjuntar Factura" 
+                                                                      fileUploadListener="#{detalleSolicitudController.uploadFacturaMaterial}"
+                                                                      sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                                      allowTypes="/(\.|\/)(pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser pdf, png o jpg" 
+                                                                      update="factura-ok"/>
+                                                    </p:column>
+                                                    <p:column styleClass="vertical-align-top">
+                                                        <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="factura-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.factura == null}"/>
+                                                    </p:column>
+                                                </p:row>    
+                                            </p:panelGrid>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column colspan="2"  style="padding: 0">
+                                            <p:panelGrid  style="padding: 0">
+                                                <p:row>
+                                                    <p:column>
+                                                        <p:fileUpload auto="true" mode="advanced" label="Adjuntar Imagen" 
+                                                                      fileUploadListener="#{detalleSolicitudController.uploadImagenMaterial}"
+                                                                      sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                                      allowTypes="/(\.|\/)(pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser pdf, png o jpg" 
+                                                                      update="material-ok"/>
+                                                    </p:column>
+                                                    <p:column styleClass="vertical-align-top">
+                                                        <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="material-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial.imagen == null}"/>
+                                                    </p:column>
+                                                </p:row>    
+                                            </p:panelGrid>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column colspan="2" styleClass="centrado">
+                                            <p:commandButton value="Agregar a Lista" styleClass="green-btn" process="detalle-material-motivo datos-material" update="detalle-material" action="#{detalleSolicitudController.limpiarMaterial()}">
+                                                <p:collector value="#{detalleSolicitudController.detalleSolicitudForm.itemMaterial}" addTo="#{detalleSolicitudController.detalleSolicitudForm.materiales}" unique="false"/>
+                                            </p:commandButton>
+                                            <p:spacer width="15px" />
+                                            <p:commandButton value="Limpiar" styleClass="red-btn" type="reset"/>
+                                        </p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                            </div>
+                            <div class="ui-g-12 ui-lg-6">
+                                <p:dataTable id="table-materiales" styleClass="tabla-fondo-transparente" value="#{detalleSolicitudController.detalleSolicitudForm.materiales}" 
+                                             var="mat" rowIndexVar="index" paginator="false"
+                                             rowStyleClass="#{mat.material.activo == 1 ? 'ui-helper-hidden' : ''}"
+                                             emptyMessage="Aun no se agregan materiales a la lista">
+                                    <f:facet name="header">
+                                        <h:outputText value="Lista de Materiales" />
+                                    </f:facet>
+                                    <p:column headerText="Descripción">
+                                        <p:panelGrid>
+                                            <p:row>
+                                                <p:column colspan="2">
+                                                    <h:outputText value="#{mat.material.cantidad} - " styleClass="negritas"/>
+                                                    <h:outputText value=" #{mat.material.descripcion}" />
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <h:outputText value="Marca: " styleClass="negritas"/>
+                                                    <h:outputText value="#{mat.material.marca}" />
+                                                </p:column>
+                                                <p:column>
+                                                    <h:outputText value="Modelo: " styleClass="negritas"/>
+                                                    <h:outputText value="#{mat.material.modelo}" />
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <h:outputText value="Serie: " styleClass="negritas"/>
+                                                    <h:outputText value="#{mat.material.numserie}" />
+                                                </p:column>
+                                                <p:column>
+                                                    <h:outputText value="Propietario: " styleClass="negritas"/>
+                                                    <h:outputText value="#{mat.material.propietario}" />
+                                                </p:column>
+                                            </p:row>
+                                            <p:row rendered="#{detalleSolicitudController.detalleSolicitudForm.numSolicitud != 0}">
+                                                <p:column>
+                                                    <p:commandButton onsuccess="cerrarDescarga();" disabled="#{mat.material.driveimagen == null}" value="Imagen" icon="fa fa-image" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarMaterial(mat.material, 1)}" update=":download-form" process="@this"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <p:commandButton onsuccess="cerrarDescarga();" disabled="#{mat.material.drivefactura == null}" value="Factura" icon="fa fa-file-text-o" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarMaterial(mat.material, 2)}" update=":download-form" process="@this"/>
+                                                </p:column>
+                                            </p:row>
+                                        </p:panelGrid>
+                                    </p:column>
+                                    <p:column headerText="Eliminar" styleClass="centrado vertical-align-top" style="width: 60px">
+                                        <p:commandButton icon="ui-icon-trash" styleClass="red-btn" update="table-materiales" process="table-materiales" actionListener="#{detalleSolicitudController.quitarMaterial(index)}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </div>
+                        <br />
+                        <p:spacer height="10px" />
+                        <br />
+                        <p:panelGrid id="detalle-material-placa" rendered="#{detalleSolicitudController.detalleSolicitudForm.materiales.size() != 0}">
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Ingresa el número de placa del transporte" />
+                                </p:column>
+                                <p:column>
+                                    <p:inputText id="placa-trasnporte" value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.placa}" size="8">
+                                        <p:keyFilter regEx="/[a-z0-9]/i"/>
+                                    </p:inputText>
+                                </p:column>
+                                <p:column>
+                                    <p:commandButton icon="ui-icon-search" actionListener="#{detalleSolicitudController.buscaVehiculo()}" update=":solicitud-form" process="@this placa-trasnporte" />
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+                    </p:panel>
+                </p:outputPanel>
+
+                <p:outputPanel id="detalle-vehiculo">
+                    <p:outputPanel rendered="#{detalleSolicitudController.detalleSolicitudForm.renderDetalleVehiculo}">
+                        <p:panel header="Datos del Vehículo">
+                            <p:outputPanel id="datos-vehiculo">
+                                <div class="ui-g" style="max-width: 735px">
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Tipo" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-10">
+                                        <p:selectOneRadio value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.tipo}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                                            <p:ajax update="datos-vehiculo" process="@this"/>
+                                            <f:selectItem itemLabel="Personal" itemValue="1" />
+                                            <f:selectItem itemLabel="Oficial" itemValue="2" />
+                                        </p:selectOneRadio>
+                                    </div>
+
+                                    <div class="ui-g-4 ui-md-2" style="display: #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 3 
+                                                                                  or detalleSolicitudController.detalleSolicitudForm.vehiculo.tipo == 1 ? '' : 'none'}">
+                                        <h:outputText value="Conductor" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-10" style="display: #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 3 
+                                                                                   or detalleSolicitudController.detalleSolicitudForm.vehiculo.tipo == 1 ? '' : 'none'}">
+                                        <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.detallevehiculo.nombreconductor}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+                                    
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Empresa" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-10" >
+                                        <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.detallevehiculo.empresa}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Marca" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-4">
+                                        <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.marca}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Modelo" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-4">
+                                        <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.modelo}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Color" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-4">
+                                        <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.color}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Placa" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-4">
+                                        <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.placa}" readonly="true" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+
+                                    <div class="ui-g-12">
+                                        <br />
+                                        <h:panelGroup styleClass="md-inputfield">
+                                            <p:inputTextarea value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.descripcion}" rows="5" cols="50" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                            <label>Descripción del Vehículo</label>
+                                        </h:panelGroup>
+                                        <br />
+                                    </div>
+
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Póliza de seguro" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-4">
+                                        <p:inputText value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.numpoliza}" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-2">
+                                        <h:outputText value="Vigencia" />
+                                    </div>
+                                    <div class="ui-g-8 ui-md-4">
+                                        <p:calendar navigator="true" value="#{detalleSolicitudController.detalleSolicitudForm.vehiculo.vigenciapoliza}" size="14" showOn="button" pattern="dd/MM/yyyy" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"  yearRange="-0:+5"/>
+                                    </div>
+                                </div>
+                            </p:outputPanel>
+                            <p:panelGrid>
+                                <p:row>
+                                    <p:column rendered="#{detalleSolicitudController.detalleSolicitudForm.renderPolizaSeguro}" styleClass="vertical-align-top">
+                                        <p:commandButton onsuccess="cerrarDescarga();" value="Póliza" icon="fa fa-life-bouy" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarArchivo(5)}" update=":download-form" process="@this"/>
+                                    </p:column>
+                                    <p:column colspan="#{detalleSolicitudController.detalleSolicitudForm.renderPolizaSeguro ? 1 : 2}" style="padding: 0">
+                                        <p:panelGrid>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:fileUpload auto="true" mode="advanced" label="#{detalleSolicitudController.detalleSolicitudForm.renderPolizaSeguro ? 'Actualizar' : 'Adjuntar Póliza'}" 
+                                                                  fileUploadListener="#{detalleSolicitudController.uploadPolizaSeguroVehiculo}"
+                                                                  sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                                  allowTypes="/(\.|\/)(pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser pdf, png o jpg" 
+                                                                  update="poliza-vehiculo-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                                </p:column>
+                                                <p:column styleClass="vertical-align-top">
+                                                    <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="poliza-vehiculo-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfPolizaSeguroVehiculo == null}"/>
+                                                </p:column>
+                                            </p:row>    
+                                        </p:panelGrid>
+                                    </p:column>
+                                </p:row>
+                                <p:row>
+                                    <p:column rendered="#{detalleSolicitudController.detalleSolicitudForm.renderTarjetaCirculacion}" styleClass="vertical-align-top">
+                                        <p:commandButton onsuccess="cerrarDescarga();" value="T. Circulación" icon="fa fa-car" styleClass="green-btn" actionListener="#{detalleSolicitudController.descargarArchivo(6)}" update=":download-form" process="@this"/>
+                                    </p:column>
+                                    <p:column colspan="#{detalleSolicitudController.detalleSolicitudForm.renderTarjetaCirculacion ? 1 : 2}" style="padding: 0">
+                                        <p:panelGrid>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:fileUpload auto="true" mode="advanced" label="#{detalleSolicitudController.detalleSolicitudForm.renderTarjetaCirculacion ? 'Actualizar' : 'Adjuntar T. Circulación'}" 
+                                                                  fileUploadListener="#{detalleSolicitudController.uploadTarjetaCirculacion}"
+                                                                  sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                                  allowTypes="/(\.|\/)(pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser pdf, png o jpg" 
+                                                                  update="tarjeta-circulacion-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                                </p:column>
+                                                <p:column styleClass="vertical-align-top">
+                                                    <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="tarjeta-circulacion-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfTarjetaCirculacion == null}"/>
+                                                </p:column>
+                                            </p:row>    
+                                        </p:panelGrid>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                            <p:panel header="Vigencia del Permiso">
+                                <div class="ui-g" >
+                                    <div class="ui-g-3  ui-md-2">
+                                        <h:outputText value="Fecha inicio" />
+                                    </div>
+                                    <div class="ui-g-9  ui-md-4">
+                                        <p:calendar size="14" value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.fechainicio}" mindate="#{detalleSolicitudController.detalleSolicitudForm.fechaInicio}" maxdate="#{detalleSolicitudController.detalleSolicitudForm.fechaFin}" showOn="button" pattern="dd/MM/yyyy" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+                                    <div class="ui-g-3  ui-md-2" style="display: #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 2  ? '' : 'none'}">
+                                        <h:outputText value="Fecha fin" />
+                                    </div>
+                                    <div class="ui-g-9  ui-md-4" style="display: #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 2  ? '' : 'none'}">
+                                        <p:calendar size="14" value="#{detalleSolicitudController.detalleSolicitudForm.solicitud.fechafin}" mindate="#{detalleSolicitudController.detalleSolicitudForm.fechaInicio}" maxdate="#{detalleSolicitudController.detalleSolicitudForm.fechaFin}" showOn="button" pattern="dd/MM/yyyy" disabled="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}"/>
+                                    </div>
+                                    <div class="ui-g-12" style="display: #{detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 2  ? '' : 'none'}">
+                                        <h:panelGroup styleClass="md-inputfield">
+                                            <p:inputTextarea value="#{detalleSolicitudController.detalleSolicitudForm.detallevehiculo.motivoingreso}" rows="5" cols="40"/>
+                                            <label>Detalla el motivo de ingreso</label>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </p:panel>
+                        </p:panel>
+                    </p:outputPanel>
+                </p:outputPanel>
+                <br />
+                <p:spacer height="10px" />
+                <br />
+                <div align="center">
+                    <p:commandButton value="#{detalleSolicitudController.detalleSolicitudForm.numSolicitud != 0 ? 'Actualizar' : 'Registrar'} Solicitud" styleClass="green-btn" actionListener="#{detalleSolicitudController.registrarSolicitud}" update=":pdf-form"
+                                     rendered="#{(detalleSolicitudController.detalleSolicitudForm.renderDetallePersonal 
+                                                 or detalleSolicitudController.detalleSolicitudForm.renderDetalleVehiculo 
+                                                 or detalleSolicitudController.detalleSolicitudForm.solicitud.tiposolicitudid.tiposolicitudid == 3) 
+                                                 and !detalleSolicitudController.detalleSolicitudForm.usuarioAdmin
+                                                 and detalleSolicitudController.detalleSolicitudForm.solicitud.estatussolicitudid.estatussolicitudid != 2
+                                                 and detalleSolicitudController.detalleSolicitudForm.solicitud.estatussolicitudid.estatussolicitudid != 3}" disabled="#{detalleSolicitudController.detalleSolicitudForm.solicitud.estatussolicitudid.estatussolicitudid != 1}"/>
+                    <p:panelGrid rendered="#{detalleSolicitudController.detalleSolicitudForm.usuarioAdmin}">
+                        <p:row>
+                            <p:column styleClass="right">
+                                <p:commandButton process="@this" style="width: 175px" styleClass="amber-btn" value="ZIP Documentos" icon="fa fa-file-zip-o" onsuccess="cerrarDescargaZip();" update=":download-zip-form" actionListener="#{detalleSolicitudController.descargarDocumentos}" />
+                            </p:column>
+                            <p:column>
+                                <p:commandButton process="@this" style="width: 175px" styleClass="amber-btn" value="Solicitud de Acceso" icon="fa fa-file-pdf-o" update=":pdf-form" actionListener="#{detalleSolicitudController.mostrarPDFSolicitud}" />
+                            </p:column>
+                        </p:row>
+                        <p:row rendered="#{detalleSolicitudController.detalleSolicitudForm.solicitud.aprobacionfinal == 1 and !detalleSolicitudController.detalleSolicitudForm.soloLectura}">
+                            <p:column styleClass="right">
+                                <p:commandButton process="@this" style="width: 175px" styleClass="green-btn" value="Aprobar Solicitud" update="panel-revision" icon="ui-icon-check" onclick="PF('confirmation').show()">
+                                    <f:setPropertyActionListener value="1" target="#{detalleSolicitudController.detalleSolicitudForm.tipoRevision}" />
+                                </p:commandButton>
+                            </p:column>
+                            <p:column>
+                                <p:commandButton process="@this" style="width: 175px" styleClass="red-btn" value="Rechazar Solicitud"  update="panel-revision" icon="ui-icon-close" onclick="PF('confirmation').show()">
+                                    <f:setPropertyActionListener value="2" target="#{detalleSolicitudController.detalleSolicitudForm.tipoRevision}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </div>
+                <p:confirmDialog id="confirmacion" message="Indica si tienes alguna observación" header="Confirmación" severity="alert" widgetVar="confirmation">
+                    <p:outputPanel id="panel-revision">
+                        <div align="center">
+                            <h:outputText value="#{detalleSolicitudController.detalleSolicitudForm.tipoRevision == 1 ? 'Aprobación' : 'Rechazo'}" style="font-size: 16px; font-weight: bold; color: #0082CA"  />
+                            <br /><br />
+                            <h:panelGroup styleClass="md-inputfield">
+                                <p:inputTextarea value="#{detalleSolicitudController.detalleSolicitudForm.revisionsolicitud.observaciones}" rows="4" cols="40"/>
+                                <label>Observaciones</label>
+                            </h:panelGroup>
+                            <br />
+                            <p:panelGrid rendered="#{detalleSolicitudController.detalleSolicitudForm.tipoRevision == 1 and detalleSolicitudController.detalleSolicitudForm.usuario.tipousuarioid.tipousuarioid == 1}"  style="padding: 0">
+                                <p:row>
+                                    <p:column style="padding: 0">
+                                        <p:fileUpload auto="true" mode="advanced" label="Adjuntar Aprobación" 
+                                                      fileUploadListener="#{detalleSolicitudController.uploadAprobacion}"
+                                                      sizeLimit="2097152" invalidSizeMessage="El tamaño máximo del archivo es de 2Mb"
+                                                      allowTypes="/(\.|\/)(zip|rar|pdf|png|jpe?g)$/" invalidFileMessage="La extensión del archivo debe de ser zip, rar, pdf, png o jpg" 
+                                                      update="aprob-ok"/>
+                                    </p:column>
+                                    <p:column styleClass="vertical-align-top">
+                                        <p:commandButton icon="ui-icon-check" styleClass="green-btn" id="aprob-ok" disabled="#{detalleSolicitudController.detalleSolicitudForm.pdfAprobacion == null}"/>
+                                    </p:column>
+                                </p:row>    
+                            </p:panelGrid>
+                            <p:commandButton process="confirmacion" value="Aceptar" icon="ui-icon-check" styleClass="green-btn" onsuccess="PF('confirmation').hide()" actionListener="#{detalleSolicitudController.revisarSolicitud}" update=":solicitud-form"/>
+                            <p:spacer height="20px" width="15px" />
+                            <p:commandButton process="@this" value="Cancelar" icon="ui-icon-close" styleClass="red-btn" onclick="PF('confirmation').hide()"/>
+                        </div>
+                    </p:outputPanel>
+                </p:confirmDialog>
+                <p:confirmDialog message="¿Estas seguro de que desea revocar el acceso?" header="Confirmación" severity="alert" widgetVar="confirmRevocar">
+                    <h:panelGroup styleClass="md-inputfield">
+                        <p:inputTextarea id="obs-revocacion" value="#{detalleSolicitudController.detalleSolicitudForm.observacionesRevocacion}" rows="4" cols="40"/>
+                        <label>Observaciones</label>
+                    </h:panelGroup>
+                    <div align="center">
+                        <p:commandButton process="@this obs-revocacion" value="Si" icon="ui-icon-check" styleClass="green-btn" onsuccess="PF('confirmRevocar').hide()" actionListener="#{detalleSolicitudController.revocarAcceso}" update=":solicitud-form"/>
+                        <p:spacer height="20px" width="15px" />
+                        <p:commandButton process="@this" value="No" icon="ui-icon-close" styleClass="red-btn" onclick="PF('confirmRevocar').hide()"/>
+                    </div>
+                </p:confirmDialog>
+            </p:outputPanel>
+        </h:form>
+
+        <h:form id="download-form">
+            <p:dialog>
+                <p:remoteCommand actionListener="#{detalleSolicitudController.cerrarDescarga}" name="cerrarDescarga" />
+                <ui:fragment rendered="#{detalleSolicitudController.detalleSolicitudForm.renderDescarga}">
+                    <iframe src="#{request.contextPath}/webapp/download/downloadServlet?file=#{detalleSolicitudController.detalleSolicitudForm.downloadFileName}">
+                    </iframe>  
+                </ui:fragment>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="download-zip-form">
+            <p:dialog>
+                <p:remoteCommand actionListener="#{detalleSolicitudController.cerrarDescargaZip}" name="cerrarDescargaZip" />
+                <ui:fragment rendered="#{detalleSolicitudController.detalleSolicitudForm.renderDescargaZip}">
+                    <iframe src="#{request.contextPath}/webapp/download/downloadZip?key=#{detalleSolicitudController.detalleSolicitudForm.keyPDF}&amp;file=solicitud-#{detalleSolicitudController.detalleSolicitudForm.solicitud.solicitudid}">
+                    </iframe>  
+                </ui:fragment>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="pdf-form">
+            <p:dialog width="98%" height="90vh" modal="true" draggable="false" header="Confirmación Solicitud" visible="#{detalleSolicitudController.detalleSolicitudForm.renderPDF}" rendered="#{detalleSolicitudController.detalleSolicitudForm.renderPDF}">
+                <p:ajax  event="close" listener="#{detalleSolicitudController.cerrarPDF()}"/>
+                <ui:fragment>
+                    <iframe width="100%" height="100%" src="#{request.contextPath}/webapp/download/pdfServlet?key=#{detalleSolicitudController.detalleSolicitudForm.keyPDF}">
+                    </iframe>  
+                </ui:fragment>
+            </p:dialog>
+        </h:form>
+    </ui:define>  
+</ui:composition>

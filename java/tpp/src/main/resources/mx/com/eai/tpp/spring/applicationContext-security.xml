@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+    <!-- ================== Definición de roles para cada URL  ==============-->    
+    <http pattern="/webapp/**" security="none"/>
+    <http auto-config="true" access-decision-manager-ref="accessDecisionManager"  access-denied-page="/error.jsf" >
+    
+        <form-login login-processing-url="/j_spring_security_check" 
+                    login-page="/webapp/common/authentication/login.jsf"
+                    default-target-url="/webapp/private/solicitud/detalle-solicitud.jsf"
+                    always-use-default-target='true'
+                    authentication-failure-handler-ref="authenticationHandler" authentication-failure-url="/webapp/common/authentication/login.jsf?auth=fail"/>
+        <logout logout-url="/logout"  logout-success-url="/webapp/common/authentication/login.jsf" delete-cookies="JSESSIONID" invalidate-session="true" />
+        <!--Concurrent Session Control: Una session como maximo. This will prevent 
+        a user from logging in multiple times - a second login will cause the 
+        first to be invalidated-->
+        <!--        <session-management>
+            <concurrency-control max-sessions="1" />
+        </session-management>-->
+        <!--Often you would prefer to prevent a second login, in which case you can use -->
+        <!--        <session-management   invalid-session-url="/webapp/common/authentication/invalid-session.jsf">
+            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />            
+        </session-management>-->
+    </http>
+    <!-- ====================================================================-->
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider user-service-ref="autenticacionService">
+            <password-encoder hash="sha" />
+        </authentication-provider>
+    </authentication-manager>
+
+    <beans:bean id="autenticacionService" class="mx.com.eai.tpp.service.AutenticacionServiceImpl" /> 
+
+    <!-- Configura el gestor de decisiones de autenticación. -->
+    <beans:bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <!-- Define los participantes en el proceso de autenticación: -->
+        <beans:property name="decisionVoters">
+            <beans:list>
+                <beans:ref bean="decisorDeRoles" />
+                <beans:ref bean="decisorDeAutenticacion" />
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+	
+    <!-- Decisor de roles, necesario para tener nombres de roles personalizados PERFIL_-->
+    <beans:bean id="decisorDeRoles" class="org.springframework.security.access.vote.RoleVoter">
+        <beans:property name="rolePrefix" value="" />
+    </beans:bean>
+	
+    <beans:bean id="decisorDeAutenticacion" class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+    <beans:bean id="authenticationHandler" class="mx.com.eai.tpp.util.AuthenticationHandler" >
+        <beans:property name="defaultFailureUrl" value="/webapp/common/authentication/login.jsf" />
+    </beans:bean>
+    
+</beans:beans>
+

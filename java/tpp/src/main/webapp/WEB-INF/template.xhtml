@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" > 
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pu="http://primefaces.org/ultima">
+    <h:head>        
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <link rel="shortcut icon" type="image/png" href="#{request.contextPath}/webapp/images/menu/favicon.ico"/>
+        <title>TPP</title>  
+        <h:outputStylesheet name="css/nanoscroller.css" library="ultima-layout" />
+        <h:outputStylesheet name="css/animate.css" library="ultima-layout" />
+        <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
+        <h:outputStylesheet name="css/layout-blue.css" library="ultima-layout" />
+
+        <h:outputScript library="primefaces" name="jquery/jquery.js" />        
+        <script language="javascript" type="text/javascript" src="#{request.contextPath}/webapp/js/config.js" />           
+        <script language="javascript" type="text/javascript" src="#{request.contextPath}/webapp/js/get-urlvar-plugins.js" />
+        <script language="javascript" type="text/javascript" src="#{request.contextPath}/webapp/js/excellentexport.js" />
+        <h:outputScript name="js/nanoscroller.js" library="ultima-layout" />
+        <h:outputScript name="js/layout.js" library="ultima-layout" />
+        <h:outputScript name="js/ripple.js" library="ultima-layout" />
+        <h:outputScript name="js/swipe.js" library="ultima-layout" />
+        <h:outputScript name="js/charts.js" library="ultima-layout" />
+        <script>
+            function deshabilitaRetroceso() {
+                window.location.hash = "no-back-button";
+                window.location.hash = "Again-No-back-button"; //chrome
+                window.onhashchange = function () {
+                    window.location.hash = "no-back-button";
+                }
+            }
+        </script>
+        <ui:insert name="head"/>
+    </h:head>  
+    <h:body onload="deshabilitaRetroceso()" styleClass="main-body layout-compact" rendered="#{perfilUsuarioController.usuario != null}">
+        <p:growl id="messages" showDetail="true" autoUpdate="true" />
+        <p:outputPanel>
+            <div class="div-margin" align="center">
+                <div class="div-width">
+                    <ui:include src="./panel-menu-horizontal-sup.xhtml" />
+
+                    <div class="layout-main" style="width: 100%">
+                        <div class="div-content-padding" align="left" style="text-align: left; background: #FFFFFF; margin-bottom: 15px;">
+                            <ui:insert name="content"/>
+                        </div>
+                        <div>
+                            <ui:include src="./footer.xhtml" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p:outputPanel>
+
+        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+            <div align="center">
+                <i class="fa fa-circle-o-notch fa-spin ajax-loader" aria-hidden="true"></i>
+                <br />
+                <h:outputText value="Cargando..." style="margin-left: -8px;"/>
+            </div>
+        </p:dialog>
+    </h:body> 
+    <p:outputPanel rendered="#{perfilUsuarioController.usuario == null}">
+        <ui:include src="./404.xhtml" />
+    </p:outputPanel>
+</html> 
+

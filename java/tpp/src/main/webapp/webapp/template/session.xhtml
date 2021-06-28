@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" > 
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:h="http://java.sun.com/jsf/html"    
+      xmlns:p="http://primefaces.org/ui">  
+
+    <h:form prependId="false" id="sesionForm">
+        <p:idleMonitor timeout="#{session.maxInactiveInterval*1000}"   
+                       onidle="idleDialog.show()"  
+                       rendered="#{perfilUsuario.sesionSniim!=null}"/> 
+        <p:dialog header="Se terminó  el tiempo de su sesión" 
+                  resizable="false"  
+                  widgetVar="idleDialog" 
+                  modal="true" 
+                  width="400" 
+                  closable="false" 
+                  draggable="false"
+                  rendered="#{perfilUsuario.sesionSniim!=null}">  
+            <h:outputText value="Su sesión de usuario terminó, deben ingresar nuevamente sus credenciales" /> 
+            <p:menu>
+                <p:menuitem url="/logout" value="Aceptar" icon="ui-icon ui-icon-close"/>
+            </p:menu>
+        </p:dialog>  
+    </h:form>  
+
+</html> 

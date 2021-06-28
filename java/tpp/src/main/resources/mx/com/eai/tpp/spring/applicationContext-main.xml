@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+    <!-- enable autowire -->
+    <context:annotation-config /> 
+    <!--    Inyecion de los servicios sobre los actions-->
+    <context:component-scan base-package="mx.com.eai.tpp.dao,  mx.com.eai.tpp.service, mx.com.eai.tpp.controller" />
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+    <!-- Configuracion de log4j -->
+    <bean id="log4jInitializer"
+          class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod"
+                  value="org.springframework.util.Log4jConfigurer.initLogging" />
+        <property name="arguments">
+            <list>
+                <value>classpath:log4j.properties</value>
+            </list>
+        </property>
+    </bean>
+    <!--Scope de View para JSF-->
+    <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer" >
+        <property name="scopes">
+            <map>
+                <entry key="view">
+                    <bean class="mx.com.eai.tpp.util.ViewScope"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="rutas"
+          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath*:rutas.properties</value>
+            </list>
+        </property>
+    </bean>  
+    
+    <!--#Configuración del servicio de Spring: MailSernder -->  
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">  
+        <property name="host" value="smtp.gmail.com"/>  
+        <property name="port" value="587"/>  
+        <property name="protocol" value="smtp"/>
+        <property name="username" value="notificaciones@eai.mx"/>  
+        <property name="password" value="Eliz@beth84"/>  
+        <property name="defaultEncoding" value="UTF-8"/> 
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtp.quitwait">false</prop>
+            </props>
+        </property> 
+    </bean>  
+  
+    <!--#Configuración de nuestro servicio:MailService -->  
+    <bean id="envioCorreoService" class="mx.com.eai.tpp.service.EnvioCorreoServiceImpl">  
+        <property name="active" value="true"/>  
+        <property name="mailSender" ref="mailSender"/>  
+        <property name="from" value="notificaciones@eai.mx"/>  
+    </bean> 
+</beans>

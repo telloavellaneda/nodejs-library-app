@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="content">
+
+        <h:form id="solicitud-form">
+            <p:panel header="Busqueda de Solicitudes Revisadas">
+                <div class="ui-g" >
+                    <div class="ui-g-3 ui-md-2 ui-lg-1">
+                        <h:outputText value="Folio:" />
+                    </div>
+                    <div class="ui-g-9 ui-md-10 ui-lg-11">
+                        <p:inputText  value="#{solicitudesRevisadasController.solicitudesRevisadasForm.folioSolicitud}"/>
+                    </div>
+                    <div class="ui-g-3 ui-md-2 ui-lg-1">
+                        <h:outputText value="Fecha de inicio:" />
+                    </div>
+                    <div class="ui-g-9 ui-md-3 ui-lg-3">
+                        <p:calendar size="13" value="#{solicitudesRevisadasController.solicitudesRevisadasForm.busquedaFechaInicio}" showOn="button" pattern="dd/MM/yyyy" />
+                    </div>
+                    <div class="ui-g-3 ui-md-2 ui-lg-1">
+                        <h:outputText value="Fecha de fin:" />
+                    </div>
+                    <div class="ui-g-9 ui-md-5 ui-lg-3">
+                        <p:calendar size="13" value="#{solicitudesRevisadasController.solicitudesRevisadasForm.busquedaFechaFin}" showOn="button" pattern="dd/MM/yyyy" />
+                    </div>
+                    <div class="ui-g-3 ui-md-2 ui-lg-1">
+                        <h:outputText value="Estatus:" />
+                    </div>
+                    <div class="ui-g-7 ui-md-3 ui-lg-2">
+                        <p:selectOneMenu value="#{solicitudesRevisadasController.solicitudesRevisadasForm.estatusSeleccionado}">
+                            <f:selectItem itemLabel="Todas" itemValue="0" />
+                            <f:selectItem itemLabel="Pendientes" itemValue="1" />
+                            <f:selectItem itemLabel="Aprobadas" itemValue="2" />
+                            <f:selectItem itemLabel="Rechazadas" itemValue="3" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-2 ui-md-7 ui-lg-1">
+                        <p:commandButton icon="ui-icon-search" actionListener="#{solicitudesRevisadasController.buscarSolicitudes}" update="table-solicitudes" />
+                    </div>
+                </div>
+            </p:panel>
+            <p:dataTable id="table-solicitudes" rowStyleClass="#{sol.estatussolicitudid.estatussolicitudid == 2 and sol.aprobacionfinal == 0 ? 'td_verde' : (sol.estatussolicitudid.estatussolicitudid == 3 ? 'td_aviso' : '')}"
+                         selectionMode="single" value="#{solicitudesRevisadasController.solicitudesRevisadasForm.solicitudes}" rowKey="#{sol.solicitudid}" var="sol" 
+                         paginator="true" paginatorPosition="bottom" rows="20" emptyMessage="No hay ninguna solicitud solicitud">
+                <p:ajax event="rowSelect" listener="#{solicitudesRevisadasController.redirectSolicitud}" />
+                <f:facet name="header">
+                    <h:outputText value="Lista de Solicitudes" />
+                </f:facet>
+                <p:column width="100" headerText="Folio" styleClass="right" sortBy="#{sol.solicitudid}" >
+                    <h:outputText value="#{sol.solicitudid}" />
+                </p:column>
+                <p:column headerText="Registro" styleClass="centrado" sortBy="#{sol.fecharegistro}" priority="6">
+                    <h:outputText value="#{sol.fecharegistro}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Usuario" sortBy="#{sol.persid.nombre} #{sol.persid.apaterno}">
+                    <h:outputText value="#{sol.persid.nombre} #{sol.persid.apaterno}" />
+                </p:column>
+                <p:column headerText="Revisado" sortBy="#{sol.ultimousuariorevisaid.nombre} #{sol.ultimousuariorevisaid.apaterno}" priority="5">
+                    <h:outputText value="#{sol.ultimousuariorevisaid.nombre} #{sol.ultimousuariorevisaid.apaterno} / "/><h:outputText value="#{sol.ultimousuariorevisaid.empresa}"/>
+                </p:column>
+                <p:column headerText="Tipo" styleClass="centrado" sortBy="#{sol.tiposolicitudid.descripcion}">
+                    <h:outputText value="#{sol.tiposolicitudid.descripcion}" />
+                </p:column>
+                <p:column headerText="Ingreso" styleClass="centrado" sortBy="#{sol.fechainicio}" priority="4">
+                    <h:outputText value="#{sol.fechainicio}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Estatus" styleClass="centrado" sortBy="#{sol.estatussolicitudid.descripcion}" priority="5">
+                    <h:outputText value="#{sol.estatussolicitudid.estatussolicitudid == 2 and sol.aprobacionfinal == 1 ? 'En revisión' :  sol.estatussolicitudid.descripcion}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>  
+</ui:composition>
