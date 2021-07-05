@@ -1,0 +1,27 @@
+<%- include ../layouts/header.ejs %>
+<br/>
+<br/>
+<br/>
+<div class="card">
+    <div class="card-header">
+        App Library
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Book's info</h5>
+        <p class="card-text">
+            <form method="post" action="/books" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="my-input">Name: </label>
+                    <input id="my-input" class="form-control" type="text" name="bookname">
+                </div>
+                <div class="form-group">
+                    <label for="my-input">Image:</label>
+                    <input id="my-input" class="form-control-file" type="file" name="bookimg">
+                </div>
+                <button class="btn btn-success" type="submit">Save</button>
+                <a class="btn btn-primary" href="/books">Cancel</a>
+            </form>
+        </p>
+    </div>
+</div>
+<%- include ../layouts/footer.ejs %>
