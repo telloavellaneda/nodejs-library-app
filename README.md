@@ -1,5 +1,6 @@
-- 👋 Hi, I’m @telloavellaneda and I'm a Business Analyst.
-- 👀 I’m interested in Node.js, React, Javascript, MySQL, MariaDB, API's
-- 🌱 I’m currently learning Web Apps
-- 💞️ I’m looking to collaborate on Start-ups, IT Consulting Services
-- 📫 How to reach me: me@telloavellaneda.com and https://www.linkedin.com/in/telloavellaneda/
+If you want to replicate this project asap in your own localhost, type the following steps on your terminal:
+
+- npm install express --save
+- npm install express-generator -g
+- express --view=ejs
+- npm install
