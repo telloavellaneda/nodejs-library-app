@@ -3,7 +3,7 @@ var maindbconnection = mysql.createConnection({
     host:'localhost',
     user: 'root',
     password: '',
-    database:'libraryapp'
+    database:'library_app'
 })
 
 maindbconnection.connect(
